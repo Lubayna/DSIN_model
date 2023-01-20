@@ -6,8 +6,10 @@ from joblib import Parallel, delayed
 
 from config import FRAC
 #import random
-
+cate_intervals = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/cate_intervals')
+#print(cate_intervals)
 def gen_session_list_dsin(uid, t):
+  #  cate_intervals = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/cate_intervals')
     t.sort_values('time_stamp', inplace=True, ascending=True)
     last_time = 1483574401  # pd.to_datetime("2017-01-05 00:00:01")
     session_list = []
@@ -19,30 +21,15 @@ def gen_session_list_dsin(uid, t):
         cate_id = row[1]['cate']
         brand = row[1]['brand']
         # delta.total_seconds()
-        if delta > 30 * 60:  # Session begin when current behavior and the last behavior are separated by more than 30 minutes.
+        if cate_id in cate_intervals.index:
+            threshold = cate_intervals.at[cate_id, 'interval']
+        if threshold and delta > threshold:  # Session begin when current behavior and the last behavior are separated by more than 30 minutes.
             if len(session) > 2:  # Only use sessions that have >2 behaviors
                 session_list.append(session[:])
             session = []
 
         session.append((cate_id, brand, time_stamp))
         last_time = time_stamp
-    if len(session) > 2:
-        session_list.append(session[:])
-    return uid, session_list
-
-
-def gen_session_list_din(uid, t):
-    t.sort_values('time_stamp', inplace=True, ascending=True)
-    session_list = []
-    session = []
-    for row in t.iterrows():
-        time_stamp = row[1]['time_stamp']
-        # pd_time = pd.to_datetime(timestamp_datetime())
-        # delta = pd_time  - last_time
-        cate_id = row[1]['cate']
-        brand = row[1]['brand']
-        session.append((cate_id, brand, time_stamp))
-
     if len(session) > 2:
         session_list.append(session[:])
     return uid, session_list
@@ -74,10 +61,9 @@ def gen_user_hist_sessions(model, FRAC=0.25):
     print(n_samples)
     batch_size = 150000
     iters = (n_samples - 1) // batch_size + 1
-    print(iters)
+
     print("total", iters, "iters", "batch_size", batch_size)
     for i in range(0, iters):
-        print('{0}iter'.format(i))
         target_user = user['userid'].values[i * batch_size:(i + 1) * batch_size]
         sub_data = data.loc[data.user.isin(target_user)]
         print(i, 'iter start')
@@ -90,7 +76,8 @@ def gen_user_hist_sessions(model, FRAC=0.25):
         # print(u1, x1)
         # u2, x2 = random.choice(list(user_hist_session.items()))
         # print(u2, x2)
-        pd.to_pickle(user_hist_session, '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/user_hist_session_' +
+       # pd.to_pickle(user_hist_session, '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/new_user_hist_session.pkl')
+        pd.to_pickle(user_hist_session, '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/new_user_hist_session_' +
                      str(FRAC) + '_' + model + '_' + str(i) + '.pkl')
         print(i, 'pickled')
         del user_hist_session

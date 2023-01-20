@@ -44,11 +44,9 @@ def gen_sess_feature_dsin(row):
                         in_sess_count += 1    # 只要session中的行为时间在广告之前则累加到session内行为数
                 if in_sess_count > 2:
                     #当一个session内的行为数多于2时，而且多于sess_max_len时，选取最后的sess_max_len个行为，记录cate和brand
-                    sess_input_dict['sess_0']['cate_id'] = \
-                        [e[0] for e in cur_sess[max(0, in_sess_count - sess_max_len):in_sess_count]]
+                    sess_input_dict['sess_0']['cate_id'] = [e[0] for e in cur_sess[max(0, in_sess_count - sess_max_len):in_sess_count]]
                     # 当一个session内的行为数多于2时，而且小于sess_max_len时，选取所有行为，记录cate和brand
-                    sess_input_dict['sess_0']['brand'] = \
-                        [e[1] for e in cur_sess[max(0, in_sess_count - sess_max_len):in_sess_count]]
+                    sess_input_dict['sess_0']['brand'] = [e[1] for e in cur_sess[max(0, in_sess_count - sess_max_len):in_sess_count]]
                     sess_input_length_dict['sess_0'] = min(sess_max_len, in_sess_count)
                     last_sess_idx = i
                     valid_sess_count += 1
@@ -68,26 +66,21 @@ def gen_sess_feature_dsin(row):
         sess_length = valid_sess_count
     return sess_input_dict, sess_input_length_dict, sess_length
 
+
 if __name__ == "__main__":
 
     user_hist_session = {}
     #所有user_hist_session_0.25_dsin 文件数
     FILE_NUM = len(
-        list(filter(lambda x: x.startswith('user_hist_session_' + str(FRAC) + '_dsin_'),
+        list(filter(lambda x: x.startswith('new_user_hist_session_' + str(FRAC) + '_dsin_'),
                     os.listdir('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/'))))
 
     print('total', FILE_NUM, 'files')
 
-    user_hist_session_ = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/user_hist_session_0.25_dsin_1.pkl')  # 19,34
-  #  user_hist_session.update(user_hist_session_)
-
     for i in range(FILE_NUM):
         #读取每个hist session文件，并追加到后面
-        # with open('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/user_hist_session_' + str(FRAC) + '_dsin_' + str(i) + '.pkl', 'wb') as f:
-        #     user_hist_session_ = pickle.load(f)
-        #     user_hist_session.update(user_hist_session_)
         user_hist_session_ = pd.read_pickle(
-            '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/user_hist_session_' + str(FRAC) + '_dsin_' + str(i) + '.pkl')  # 19,34
+            '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/new_user_hist_session_' + str(FRAC) + '_dsin_' + str(i) + '.pkl')  # 19,34
         user_hist_session.update(user_hist_session_)
         del user_hist_session_
     #print(user_hist_session)
@@ -112,8 +105,6 @@ if __name__ == "__main__":
 
         sess_input_dict_, sess_input_length_dict_, sess_length = gen_sess_feature_dsin(
             row)
-
-
         for i in range(SESS_COUNT):
             sess_name = 'sess_' + str(i)
             sess_input_dict[sess_name]['cate_id'].append(
@@ -177,11 +168,11 @@ if __name__ == "__main__":
     if not os.path.exists('/Users/yuxuanyang/Downloads/DSIN-master/model_input/'):
         os.mkdir('/Users/yuxuanyang/Downloads/DSIN-master/model_input/')
 
-    pd.to_pickle(model_input, '/Users/yuxuanyang/Downloads/DSIN-master/model_input/dsin_input_' +
+    pd.to_pickle(model_input, '/Users/yuxuanyang/Downloads/DSIN-master/model_input/new_dsin_input_' +
                  str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
-    pd.to_pickle(data['clk'].values, '/Users/yuxuanyang/Downloads/DSIN-master/model_input/dsin_label_' +
+    pd.to_pickle(data['clk'].values, '/Users/yuxuanyang/Downloads/DSIN-master/model_input/new_dsin_label_' +
                  str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
     pd.to_pickle(feature_columns,
-                 '/Users/yuxuanyang/Downloads/DSIN-master/model_input/dsin_fd_' +
+                 '/Users/yuxuanyang/Downloads/DSIN-master/model_input/new_dsin_fd_' +
                  str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
     print("gen dsin input done")

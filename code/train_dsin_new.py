@@ -33,29 +33,46 @@ if __name__ == "__main__":
     SESS_COUNT = DSIN_SESS_COUNT
     SESS_MAX_LEN = DSIN_SESS_MAX_LEN
 
-    dnn_feature_columns = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/model_input/dsin_fd_' +
+    dnn_feature_columns = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/model_input/new_dsin_fd_' +
                                          str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
     print('dsin_fd_0.25_5')
     print(dnn_feature_columns)
     model_input = pd.read_pickle(
-        '/Users/yuxuanyang/Downloads/DSIN-master/model_input/dsin_input_' + str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
-    label = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/model_input/dsin_label_' +
+        '/Users/yuxuanyang/Downloads/DSIN-master/model_input/new_dsin_input_' + str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
+    label = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/model_input/new_dsin_label_' +
                            str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
+    # print('dsin_input_0.25_5')
+    # print(len(model_input))
+    # print(model_input)
+    # print('dsin_input_0.25_5_key')
+    # print(model_input.keys())
 
+   # print(label)
     sample_sub = pd.read_pickle(
         '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/raw_sample_' + str(FRAC) + '.pkl')
+    # print('raw_sample')
+    # print(len(sample_sub))
+    # print(sample_sub)
     sample_sub['idx'] = list(range(sample_sub.shape[0]))
     train_idx = sample_sub.loc[sample_sub.time_stamp <
                                1494633600, 'idx'].values
     test_idx = sample_sub.loc[sample_sub.time_stamp >=
                               1494633600, 'idx'].values
 
-
     train_input = {k: v[train_idx] for k, v in model_input.items()}
     test_input = {k: v[test_idx] for k, v in model_input.items()}
-
+    print('train_input')
+    print(len(train_input))
+    print('test_input')
+    print(len(test_input))
     train_label = label[train_idx]
     test_label = label[test_idx]
+
+    print('train_user_id')
+    print(len(train_input['userid']))
+    print('test_user_id')
+    print(len(test_input['userid']))
+
 
     sess_count = SESS_COUNT
     sess_len_max = SESS_MAX_LEN

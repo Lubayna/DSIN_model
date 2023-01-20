@@ -5,7 +5,7 @@ import pandas as pd
 from joblib import Parallel, delayed
 
 from config import FRAC
-#import random
+
 
 def gen_session_list_dsin(uid, t):
     t.sort_values('time_stamp', inplace=True, ascending=True)
@@ -57,19 +57,18 @@ def applyParallel(df_grouped, func, n_jobs, backend='multiprocessing'):
 
 
 def gen_user_hist_sessions(model, FRAC=0.25):
-    if model not in ['dsin']:
+    if model not in [ 'dsin']:
         raise ValueError('model must be din or dmsn')
 
     print("gen " + model + " hist sess", FRAC)
     name = '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/behavior_log_pv_user_filter_enc_' + str(FRAC) + '.pkl'
     data = pd.read_pickle(name)
     data = data.loc[data.time_stamp >= 1493769600]  # 0503-0513
-    # print('behavior_log_pv_user_filter_enc_')
-    # print(data.head(10))
     # 0504~1493856000
     # 0503 1493769600
 
     user = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/user_profile_' + str(FRAC) + '.pkl')
+
     n_samples = user.shape[0]
     print(n_samples)
     batch_size = 150000
@@ -77,19 +76,17 @@ def gen_user_hist_sessions(model, FRAC=0.25):
     print(iters)
     print("total", iters, "iters", "batch_size", batch_size)
     for i in range(0, iters):
-        print('{0}iter'.format(i))
+        print('{0}iter starts'.format(i))
         target_user = user['userid'].values[i * batch_size:(i + 1) * batch_size]
         sub_data = data.loc[data.user.isin(target_user)]
         print(i, 'iter start')
         df_grouped = sub_data.groupby('user')
-        user_hist_session = applyParallel(
-            df_grouped, gen_session_list_dsin, n_jobs=-1, backend='multiprocessing')
-        print('this one')
-        print(len(user_hist_session))
-        # u1, x1 = random.choice(list(user_hist_session.items()))
-        # print(u1, x1)
-        # u2, x2 = random.choice(list(user_hist_session.items()))
-        # print(u2, x2)
+        if model == 'din':
+            user_hist_session = applyParallel(
+                df_grouped, gen_session_list_din, n_jobs=10, backend='loky')
+        else:
+            user_hist_session = applyParallel(
+                df_grouped, gen_session_list_dsin, n_jobs=10, backend='multiprocessing')
         pd.to_pickle(user_hist_session, '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/user_hist_session_' +
                      str(FRAC) + '_' + model + '_' + str(i) + '.pkl')
         print(i, 'pickled')
@@ -99,8 +96,7 @@ def gen_user_hist_sessions(model, FRAC=0.25):
 
     print("1_gen " + model + " hist sess done")
 
+
 if __name__ == "__main__":
-
-   # gen_user_hist_sessions('din', FRAC)
+  #  gen_user_hist_sessions('din', FRAC)
     gen_user_hist_sessions('dsin', FRAC)
-
