@@ -9,7 +9,7 @@ from config import FRAC
 
 if __name__ == "__main__":
 
-    user = pd.read_csv('/Users/yuxuanyang/Downloads/DSIN-master/raw_data/user_profile.csv')
+    user = pd.read_csv('/Users/yuxuanyang/Downloads/DSIN-master/raw_data/fpro_user_profile.csv')
     sample = pd.read_csv('/Users/yuxuanyang/Downloads/DSIN-master/raw_data/raw_sample.csv')
 
     if not os.path.exists('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/'):

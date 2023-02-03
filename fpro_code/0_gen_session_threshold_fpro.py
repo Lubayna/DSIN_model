@@ -6,9 +6,9 @@ from tqdm import tqdm
 from sklearn.ensemble import IsolationForest
 from config import FRAC
 
-log = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/behavior_log_pv_user_filter_enc_0.25.pkl')
+log = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/fpro_data/sample_user_logs.pkl')
 def gen_intervals(user, user_log, groupby_sdt):
-    sorted_log = user_log.sort_values(by = ['time_stamp'])
+    sorted_log = user_log.sort_values(by = ['datetime'])
     if len(sorted_log) > 1:
         intervals = {}
         time1 = sorted_log.time_stamp.to_numpy()[:-1]

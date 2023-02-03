@@ -83,7 +83,7 @@ if __name__ == "__main__":
     user_hist_session = {}
     FILE_NUM = len(
         list(filter(lambda x: x.startswith('user_hist_session_' + str(FRAC) + '_dsin_'),
-                    os.listdir('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/'))))
+                    os.listdir('./DSIN-master/fpro_data/'))))
 
     print('total', FILE_NUM, 'files')
 
@@ -91,12 +91,12 @@ if __name__ == "__main__":
         # 每个用户的所有session，每个session中有多个点击数据
         # 点击数据 = （cate，brand，datetime）
         user_hist_session_ = pd.read_pickle(
-            '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/new_user_hist_session_' + str(FRAC) + '_dsin_' + str(i) + '.pkl')  # 19,34
+            './DSIN-master/fpro_data/new_user_hist_session_' + str(FRAC) + '_dsin_' + str(i) + '.pkl')  # 19,34
         user_hist_session.update(user_hist_session_)
         del user_hist_session_
     # 抽样的广告点击数据
     sample_sub = pd.read_pickle(
-        '/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/raw_sample_' + str(FRAC) + '.pkl')
+        './DSIN-master/fpro_data/raw_sample_' + str(FRAC) + '.pkl')
     print(sample_sub) 
     # index_list = []
     sess_input_dict = {} # session的输入字典 字典key是session index
@@ -122,11 +122,11 @@ if __name__ == "__main__":
         sess_length_list.append(sess_length)
     print('生成了每条session的cate序列和brand序列，每条session长度的长度，session的个数')
 
-    user = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/user_profile_' + str(FRAC) + '.pkl')
-    ad = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/ad_feature_enc_' + str(FRAC) + '.pkl')
+    user = pd.read_pickle('./DSIN-master/fpro_data/user_profile_' + str(FRAC) + '.pkl')
+    ad = pd.read_pickle('./DSIN-master/fpro_data/ad_feature_enc_' + str(FRAC) + '.pkl')
     user = user.fillna(-1)
     user.rename(columns={'new_user_class_level ': 'new_user_class_level'}, inplace=True)
-    sample_sub = pd.read_pickle('/Users/yuxuanyang/Downloads/DSIN-master/sampled_data/raw_sample_' + str(FRAC) + '.pkl')
+    sample_sub = pd.read_pickle('./DSIN-master/fpro_data/raw_sample_' + str(FRAC) + '.pkl')
     sample_sub.rename(columns={'user': 'userid'}, inplace=True)
     data = pd.merge(sample_sub, user, how='left', on='userid', )
     data = pd.merge(data, ad, how='left', on='adgroup_id')
@@ -170,13 +170,13 @@ if __name__ == "__main__":
     feature_columns = sparse_feature_list + dense_feature_list
     model_input = feature_dict
 
-    # if not os.path.exists('/Users/yuxuanyang/Downloads/DSIN-master/model_input/'):
-    #     os.mkdir('/Users/yuxuanyang/Downloads/DSIN-master/model_input/')
+    # if not os.path.exists('./DSIN-master/model_input/'):
+    #     os.mkdir('./DSIN-master/model_input/')
 
-    # pd.to_pickle(model_input, '/Users/yuxuanyang/Downloads/DSIN-master/model_input/brand_dsin_input_' +
+    # pd.to_pickle(model_input, './DSIN-master/model_input/brand_dsin_input_' +
     #              str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
-    # pd.to_pickle(data['clk'].v    alues, '/Users/yuxuanyang/Downloads/DSIN-master/model_input/brand_dsin_label_' +
+    # pd.to_pickle(data['clk'].v    alues, './DSIN-master/model_input/brand_dsin_label_' +
     #              str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
     # pd.to_pickle(feature_columns,
-    #              '/Users/yuxuanyang/Downloads/DSIN-master/model_input/brand_dsin_fd_' + str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
+    #              './DSIN-master/model_input/brand_dsin_fd_' + str(FRAC) + '_' + str(SESS_COUNT) + '.pkl')
     # print("gen dsin input done")
